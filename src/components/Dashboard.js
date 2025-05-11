@@ -5,6 +5,7 @@ import Teaching from './Teaching';
 import Semester from './Semester';
 import Class from './Class';
 import Course from './Course';
+import Quanlykhoa from './Quanlykhoa';
 import Student from './Student';
 import Evaluation from './Evaluation';
 import ThongTinNguoiDung from './ThongTinNguoiDung';
@@ -26,6 +27,7 @@ export default function Dashboard() {
       {page === 'semester' && <Semester />}
       {page === 'class' && <Class />}
       {page === 'course' && <Course />}
+      {page === 'quanlykhoa' && <Quanlykhoa />}
       {page === 'student' && <Student />}
       {page === 'evaluation' && <Evaluation />}
       {page === 'thongtinnguoidung' && <ThongTinNguoiDung />}

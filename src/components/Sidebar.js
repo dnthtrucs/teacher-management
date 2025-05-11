@@ -10,6 +10,7 @@ export default function Sidebar({ onNavigate }) {
         <li onClick={() => onNavigate('semester')}>Học kỳ</li>
         <li onClick={() => onNavigate('class')}>Lớp học</li>
         <li onClick={() => onNavigate('course')}>Môn học</li>
+        <li onClick={() => onNavigate('quanlykhoa')}>Khoa</li>
         <li onClick={() => onNavigate('student')}>Sinh viên</li>
         <li onClick={() => onNavigate('evaluation')}>Thống kê</li>
         <li onClick={() => onNavigate('thongtinnguoidung')}>Thông tin người dùng</li>
