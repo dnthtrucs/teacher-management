@@ -1,12 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function NgachGiangVien() {
   const [ngachList, setNgachList] = useState([]);
   const [form, setForm] = useState({ id: null, tenNgach: '', he: '' });
   const [isEdit, setIsEdit] = useState(false);
 
+  // Lấy dữ liệu từ localStorage khi component được render
+  useEffect(() => {
+    const storedNgachList = JSON.parse(localStorage.getItem('ngachGiangVienList'));
+    if (storedNgachList) {
+      setNgachList(storedNgachList);
+    }
+  }, []);
+
+  // Lưu dữ liệu vào localStorage mỗi khi danh sách thay đổi
+  useEffect(() => {
+    if (ngachList.length > 0) {
+      localStorage.setItem('ngachGiangVienList', JSON.stringify(ngachList));
+    }
+  }, [ngachList]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!form.tenNgach.trim() || !form.he.trim()) {
       alert('Vui lòng nhập đầy đủ thông tin.');
       return;
@@ -29,7 +45,12 @@ export default function NgachGiangVien() {
 
   const handleDelete = (id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa?')) {
-      setNgachList(ngachList.filter(item => item.id !== id));
+      const updatedList = ngachList.filter(item => item.id !== id);
+      setNgachList(updatedList);
+
+      // Cập nhật localStorage sau khi xóa
+      localStorage.setItem('ngachGiangVienList', JSON.stringify(updatedList));
+
       setForm({ id: null, tenNgach: '', he: '' });
       setIsEdit(false);
     }

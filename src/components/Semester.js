@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Semester() {
-  const [semesters, setSemesters] = useState([
-    { id: 1, name: 'HK1', year: '2024-2025' },
-    { id: 2, name: 'HK2', year: '2024-2025' }
-  ]);
+  // Khởi tạo dữ liệu từ localStorage nếu có
+  const [semesters, setSemesters] = useState(() => {
+    const savedSemesters = localStorage.getItem('semesters');
+    return savedSemesters ? JSON.parse(savedSemesters) : [
+      { id: 1, name: 'HK1', year: '2024-2025' },
+      { id: 2, name: 'HK2', year: '2024-2025' }
+    ];
+  });
 
   const [form, setForm] = useState({ id: null, name: '', year: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lưu dữ liệu semesters vào localStorage khi có thay đổi
+  useEffect(() => {
+    localStorage.setItem('semesters', JSON.stringify(semesters));
+  }, [semesters]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,14 +65,16 @@ export default function Semester() {
       <table className="table">
         <thead>
           <tr>
+            <th>STT</th>
             <th>Học kỳ</th>
             <th>Niên khóa</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {semesters.map(s => (
+          {semesters.map((s, index) => (
             <tr key={s.id}>
+              <td>{index + 1}</td> {/* Số thứ tự tự động */}
               <td>{s.name}</td>
               <td>{s.year}</td>
               <td>

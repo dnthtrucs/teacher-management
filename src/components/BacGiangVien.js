@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function BacGiangVien() {
-  const [bacList, setBacList] = useState([]);
+  // Khởi tạo dữ liệu từ localStorage nếu có
+  const [bacList, setBacList] = useState(() => {
+    const savedBacList = localStorage.getItem('bacList');
+    return savedBacList ? JSON.parse(savedBacList) : [];
+  });
+
   const [form, setForm] = useState({ id: null, tenBac: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lưu dữ liệu bacList vào localStorage khi có thay đổi
+  useEffect(() => {
+    localStorage.setItem('bacList', JSON.stringify(bacList));
+  }, [bacList]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -61,7 +71,7 @@ export default function BacGiangVien() {
         <tbody>
           {bacList.map((b, index) => (
             <tr key={b.id}>
-              <td>{index + 1}</td>
+              <td>{index + 1}</td> {/* Số thứ tự tự động */}
               <td>{b.tenBac}</td>
               <td>
                 <button onClick={() => handleEdit(b)}>Sửa</button>

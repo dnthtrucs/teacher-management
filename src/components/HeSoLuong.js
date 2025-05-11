@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function HeSoLuong() {
   const [heSoList, setHeSoList] = useState([]);
@@ -10,6 +10,21 @@ export default function HeSoLuong() {
   });
   const [isEdit, setIsEdit] = useState(false);
 
+  // Lấy dữ liệu từ localStorage khi component được render
+  useEffect(() => {
+    const storedHeSoList = JSON.parse(localStorage.getItem('heSoList'));
+    if (storedHeSoList) {
+      setHeSoList(storedHeSoList);
+    }
+  }, []);
+
+  // Lưu dữ liệu vào localStorage mỗi khi heSoList thay đổi
+  useEffect(() => {
+    if (heSoList.length > 0) {
+      localStorage.setItem('heSoList', JSON.stringify(heSoList));
+    }
+  }, [heSoList]);
+
   const handleClearForm = () => {
     setForm({ id: null, ngach: '', bac: '', heSo: '' });
     setIsEdit(false);
@@ -19,19 +34,22 @@ export default function HeSoLuong() {
     e.preventDefault();
     const { ngach, bac, heSo } = form;
 
-    if (!ngach || !bac || !heSo) {
+    // Kiểm tra điều kiện nhập liệu
+    if (!ngach.trim() || !bac.trim() || !heSo.trim()) {
       alert('Vui lòng nhập đầy đủ thông tin.');
       return;
     }
 
+    // Kiểm tra xem ngạch và bậc đã tồn tại chưa
     if (!isEdit && heSoList.some(item => item.ngach === ngach && item.bac === bac)) {
       alert('Ngạch và bậc đã tồn tại.');
       return;
     }
 
+    // Thêm mới hoặc cập nhật
     if (isEdit) {
       setHeSoList(
-        heSoList.map(item => item.id === form.id ? form : item)
+        heSoList.map(item => (item.id === form.id ? form : item))
       );
     } else {
       setHeSoList([...heSoList, { ...form, id: Date.now() }]);
@@ -47,7 +65,13 @@ export default function HeSoLuong() {
 
   const handleDelete = (id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa?')) {
-      setHeSoList(heSoList.filter(item => item.id !== id));
+      // Xóa khỏi state
+      const updatedList = heSoList.filter(item => item.id !== id);
+      setHeSoList(updatedList);
+
+      // Cập nhật lại localStorage sau khi xóa
+      localStorage.setItem('heSoList', JSON.stringify(updatedList));
+
       handleClearForm();
     }
   };

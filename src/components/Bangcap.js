@@ -1,22 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Bangcap() {
-  const [degrees, setDegrees] = useState([
-    { id: 1, code: 'BC01', name: 'Cử nhân', shortName: 'CN' },
-    { id: 2, code: 'BC02', name: 'Thạc sĩ', shortName: 'ThS' }
-  ]);
+  // Khởi tạo dữ liệu từ localStorage nếu có
+  const [degrees, setDegrees] = useState(() => {
+    const savedDegrees = localStorage.getItem('degrees');
+    return savedDegrees ? JSON.parse(savedDegrees) : [
+      { id: 1, code: 'BC01', name: 'Cử nhân', shortName: 'CN' },
+      { id: 2, code: 'BC02', name: 'Thạc sĩ', shortName: 'ThS' }
+    ];
+  });
 
   const [form, setForm] = useState({ id: null, code: '', name: '', shortName: '' });
   const [isEdit, setIsEdit] = useState(false);
 
+  // Lưu dữ liệu vào localStorage mỗi khi degrees thay đổi
+  useEffect(() => {
+    localStorage.setItem('degrees', JSON.stringify(degrees));
+  }, [degrees]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!form.code.trim() || !form.name.trim() || !form.shortName.trim()) {
+      alert('Vui lòng nhập đầy đủ thông tin!');
+      return;
+    }
+
     if (isEdit) {
       setDegrees(degrees.map(d => (d.id === form.id ? form : d)));
       setIsEdit(false);
     } else {
       setDegrees([...degrees, { ...form, id: Date.now() }]);
     }
+
     setForm({ id: null, code: '', name: '', shortName: '' });
   };
 
@@ -26,7 +42,7 @@ export default function Bangcap() {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Bạn có chắc muốn xóa?')) {
+    if (window.confirm('Bạn có chắc chắn muốn xóa?')) {
       setDegrees(degrees.filter(d => d.id !== id));
     }
   };

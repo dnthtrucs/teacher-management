@@ -1,9 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const ThongTinNguoiDung = () => {
   const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ id: null, username: '', password: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lấy dữ liệu từ localStorage khi component được render
+  useEffect(() => {
+    const storedUsers = JSON.parse(localStorage.getItem('users'));
+    if (storedUsers) {
+      setUsers(storedUsers);
+    }
+  }, []);
+
+  // Lưu dữ liệu vào localStorage mỗi khi danh sách người dùng thay đổi
+  useEffect(() => {
+    if (users.length > 0) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+  }, [users]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,7 +52,12 @@ const ThongTinNguoiDung = () => {
     }
 
     if (window.confirm('Bạn có chắc muốn xóa tài khoản này?')) {
-      setUsers(users.filter((user) => user.id !== form.id));
+      const updatedUsers = users.filter((user) => user.id !== form.id);
+      setUsers(updatedUsers);
+
+      // Cập nhật localStorage sau khi xóa
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+
       setForm({ id: null, username: '', password: '' });
       setIsEdit(false);
     }

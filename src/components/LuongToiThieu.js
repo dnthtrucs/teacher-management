@@ -1,9 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const LuongToiThieu = () => {
   const [list, setList] = useState([]);
   const [form, setForm] = useState({ id: null, soTien: '', ngayApDung: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lấy dữ liệu từ localStorage khi component được render
+  useEffect(() => {
+    const storedList = JSON.parse(localStorage.getItem('luongToiThieuList'));
+    if (storedList) {
+      setList(storedList);
+    }
+  }, []);
+
+  // Lưu dữ liệu vào localStorage mỗi khi danh sách thay đổi
+  useEffect(() => {
+    if (list.length > 0) {
+      localStorage.setItem('luongToiThieuList', JSON.stringify(list));
+    }
+  }, [list]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -35,6 +50,10 @@ const LuongToiThieu = () => {
     if (window.confirm('Bạn có chắc chắn muốn xóa?')) {
       const updated = list.filter((_, i) => i !== index);
       setList(updated);
+
+      // Cập nhật localStorage sau khi xóa
+      localStorage.setItem('luongToiThieuList', JSON.stringify(updated));
+
       setForm({ id: null, soTien: '', ngayApDung: '' });
       setIsEdit(false);
     }
@@ -46,12 +65,12 @@ const LuongToiThieu = () => {
 
       <form onSubmit={handleSubmit} className="form">
         <input
-            type="number"
-            className="form-control"
-            placeholder="Số tiền"
-            value={form.soTien}
-            onChange={(e) => setForm({ ...form, soTien: e.target.value })}
-            required
+          type="number"
+          className="form-control"
+          placeholder="Số tiền"
+          value={form.soTien}
+          onChange={(e) => setForm({ ...form, soTien: e.target.value })}
+          required
         />
         <input
           type="date"

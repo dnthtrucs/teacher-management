@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Quanlykhoa() {
-  const [departments, setDepartments] = useState([
-    { id: 1, name: 'Công nghệ thông tin', code: 'CNTT' },
-    { id: 2, name: 'Kinh tế', code: 'KT' }
-  ]);
+  // Khởi tạo dữ liệu từ localStorage nếu có
+  const [departments, setDepartments] = useState(() => {
+    const savedDepartments = localStorage.getItem('departments');
+    return savedDepartments ? JSON.parse(savedDepartments) : [
+      { id: 1, name: 'Công nghệ thông tin', code: 'CNTT' },
+      { id: 2, name: 'Kinh tế', code: 'KT' }
+    ];
+  });
 
   const [form, setForm] = useState({ id: null, name: '', code: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lưu dữ liệu departments vào localStorage khi có thay đổi
+  useEffect(() => {
+    localStorage.setItem('departments', JSON.stringify(departments));
+  }, [departments]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,14 +65,16 @@ export default function Quanlykhoa() {
       <table className="table">
         <thead>
           <tr>
+            <th>STT</th>
             <th>Tên khoa</th>
             <th>Mã khoa</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {departments.map(dept => (
+          {departments.map((dept, index) => (
             <tr key={dept.id}>
+              <td>{index + 1}</td> {/* Số thứ tự tự động */}
               <td>{dept.name}</td>
               <td>{dept.code}</td>
               <td>

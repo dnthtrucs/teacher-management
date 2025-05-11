@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Class() {
-  const [classes, setClasses] = useState([
-    { id: 1, name: 'CNTT1', major: 'Công nghệ thông tin' },
-    { id: 2, name: 'KT1', major: 'Kế toán' }
-  ]);
+  // Khởi tạo dữ liệu từ localStorage nếu có
+  const [classes, setClasses] = useState(() => {
+    const savedClasses = localStorage.getItem('classes');
+    return savedClasses ? JSON.parse(savedClasses) : [
+      { id: 1, name: 'CNTT1', major: 'Công nghệ thông tin' },
+      { id: 2, name: 'KT1', major: 'Kế toán' }
+    ];
+  });
 
   const [form, setForm] = useState({ id: null, name: '', major: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lưu dữ liệu classes vào localStorage khi có thay đổi
+  useEffect(() => {
+    localStorage.setItem('classes', JSON.stringify(classes));
+  }, [classes]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,14 +65,16 @@ export default function Class() {
       <table className="table">
         <thead>
           <tr>
+            <th>STT</th>
             <th>Tên lớp</th>
             <th>Ngành học</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {classes.map(c => (
+          {classes.map((c, index) => (
             <tr key={c.id}>
+              <td>{index + 1}</td> {/* Số thứ tự tự động */}
               <td>{c.name}</td>
               <td>{c.major}</td>
               <td>

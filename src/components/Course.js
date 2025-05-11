@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Course() {
-  const [courses, setCourses] = useState([
-    { id: 1, name: 'Lập trình Web', code: 'WEB101' },
-    { id: 2, name: 'Kế toán tài chính', code: 'FIN202' }
-  ]);
+  // Khởi tạo dữ liệu từ localStorage nếu có
+  const [courses, setCourses] = useState(() => {
+    const savedCourses = localStorage.getItem('courses');
+    return savedCourses ? JSON.parse(savedCourses) : [
+      { id: 1, name: 'Lập trình Web', code: 'WEB101' },
+      { id: 2, name: 'Kế toán tài chính', code: 'FIN202' }
+    ];
+  });
 
   const [form, setForm] = useState({ id: null, name: '', code: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lưu dữ liệu courses vào localStorage khi có thay đổi
+  useEffect(() => {
+    localStorage.setItem('courses', JSON.stringify(courses));
+  }, [courses]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,14 +65,16 @@ export default function Course() {
       <table className="table">
         <thead>
           <tr>
+            <th>STT</th>
             <th>Tên môn học</th>
             <th>Mã môn học</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
-          {courses.map(course => (
+          {courses.map((course, index) => (
             <tr key={course.id}>
+              <td>{index + 1}</td> {/* Số thứ tự tự động */}
               <td>{course.name}</td>
               <td>{course.code}</td>
               <td>

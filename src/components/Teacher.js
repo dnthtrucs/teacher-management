@@ -1,27 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Teacher() {
   const degrees = ['Cử nhân', 'Thạc sĩ', 'Tiến sĩ'];
   const departments = ['CNTT', 'Kinh tế', 'Ngoại ngữ', 'Luật'];
 
-  const [teachers, setTeachers] = useState([
-    {
-      id: 1,
-      name: 'Nguyễn Văn A',
-      degree: 'Thạc sĩ',
-      department: 'CNTT',
-      email: 'a@university.edu',
-      phone: '0123456789'
-    },
-    {
-      id: 2,
-      name: 'Trần Thị B',
-      degree: 'Cử nhân',
-      department: 'Kinh tế',
-      email: 'b@university.edu',
-      phone: '0987654321'
-    }
-  ]);
+  // Khởi tạo dữ liệu từ localStorage nếu có
+  const [teachers, setTeachers] = useState(() => {
+    const savedTeachers = localStorage.getItem('teachers');
+    return savedTeachers ? JSON.parse(savedTeachers) : [
+      {
+        id: 1,
+        name: 'Nguyễn Văn A',
+        degree: 'Thạc sĩ',
+        department: 'CNTT',
+        email: 'a@university.edu',
+        phone: '0123456789'
+      },
+      {
+        id: 2,
+        name: 'Trần Thị B',
+        degree: 'Cử nhân',
+        department: 'Kinh tế',
+        email: 'b@university.edu',
+        phone: '0987654321'
+      }
+    ];
+  });
 
   const [form, setForm] = useState({
     id: null,
@@ -33,6 +37,11 @@ export default function Teacher() {
   });
 
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lưu dữ liệu teachers vào localStorage khi có thay đổi
+  useEffect(() => {
+    localStorage.setItem('teachers', JSON.stringify(teachers));
+  }, [teachers]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -115,35 +124,35 @@ export default function Teacher() {
         <button type="submit">{isEdit ? 'Cập nhật' : 'Thêm mới'}</button>
       </form>
 
-<table className="table">
-  <thead>
-    <tr>
-      <th>STT</th>
-      <th>Tên</th>
-      <th>Bằng cấp</th>
-      <th>Khoa</th>
-      <th>Email</th>
-      <th>SĐT</th>
-      <th>Hành động</th>
-    </tr>
-  </thead>
-  <tbody>
-    {teachers.map((t, index) => (
-      <tr key={t.id}>
-        <td>{index + 1}</td> {/* STT bắt đầu từ 1 */}
-        <td>{t.name}</td>
-        <td>{t.degree}</td>
-        <td>{t.department}</td>
-        <td>{t.email}</td>
-        <td>{t.phone}</td>
-        <td>
-          <button onClick={() => handleEdit(t)}>Sửa</button>
-          <button onClick={() => handleDelete(t.id)}>Xóa</button>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>STT</th>
+            <th>Tên</th>
+            <th>Bằng cấp</th>
+            <th>Khoa</th>
+            <th>Email</th>
+            <th>SĐT</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {teachers.map((t, index) => (
+            <tr key={t.id}>
+              <td>{index + 1}</td> {/* Số thứ tự */}
+              <td>{t.name}</td>
+              <td>{t.degree}</td>
+              <td>{t.department}</td>
+              <td>{t.email}</td>
+              <td>{t.phone}</td>
+              <td>
+                <button onClick={() => handleEdit(t)}>Sửa</button>
+                <button onClick={() => handleDelete(t.id)}>Xóa</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
     </div>
   );

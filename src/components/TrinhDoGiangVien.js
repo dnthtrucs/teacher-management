@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function TrinhDoGiangVien() {
   const [trinhDoList, setTrinhDoList] = useState([]);
@@ -9,6 +9,21 @@ export default function TrinhDoGiangVien() {
     donGiaTiet: '',
   });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lấy dữ liệu từ localStorage khi component được render
+  useEffect(() => {
+    const storedTrinhDoList = JSON.parse(localStorage.getItem('trinhDoList'));
+    if (storedTrinhDoList) {
+      setTrinhDoList(storedTrinhDoList);
+    }
+  }, []);
+
+  // Lưu dữ liệu vào localStorage mỗi khi danh sách trinhDoList thay đổi
+  useEffect(() => {
+    if (trinhDoList.length > 0) {
+      localStorage.setItem('trinhDoList', JSON.stringify(trinhDoList));
+    }
+  }, [trinhDoList]);
 
   const handleClearForm = () => {
     setForm({ id: null, maTrinhDo: '', tenTrinhDo: '', donGiaTiet: '' });

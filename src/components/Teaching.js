@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function Teaching() {
-  const [teachings, setTeachings] = useState([
-    { id: 1, teacher: 'Nguyễn Văn A', course: 'Lập trình Web', className: 'CNTT1' },
-    { id: 2, teacher: 'Trần Thị B', course: 'Kinh tế học', className: 'KT2' }
-  ]);
+  // Khởi tạo dữ liệu từ localStorage nếu có
+  const [teachings, setTeachings] = useState(() => {
+    const savedTeachings = localStorage.getItem('teachings');
+    return savedTeachings ? JSON.parse(savedTeachings) : [
+      { id: 1, teacher: 'Nguyễn Văn A', course: 'Lập trình Web', className: 'CNTT1' },
+      { id: 2, teacher: 'Trần Thị B', course: 'Kinh tế học', className: 'KT2' }
+    ];
+  });
 
   const [form, setForm] = useState({ id: null, teacher: '', course: '', className: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lưu dữ liệu teachings vào localStorage khi có thay đổi
+  useEffect(() => {
+    localStorage.setItem('teachings', JSON.stringify(teachings));
+  }, [teachings]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -63,6 +72,7 @@ export default function Teaching() {
       <table className="table">
         <thead>
           <tr>
+            <th>STT</th>
             <th>Giảng viên</th>
             <th>Môn học</th>
             <th>Lớp</th>
@@ -70,8 +80,9 @@ export default function Teaching() {
           </tr>
         </thead>
         <tbody>
-          {teachings.map(t => (
+          {teachings.map((t, index) => (
             <tr key={t.id}>
+              <td>{index + 1}</td> {/* Số thứ tự */}
               <td>{t.teacher}</td>
               <td>{t.course}</td>
               <td>{t.className}</td>

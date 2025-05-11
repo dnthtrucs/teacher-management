@@ -1,9 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const NoiDungDanhGia = () => {
   const [danhGiaList, setDanhGiaList] = useState([]);
   const [form, setForm] = useState({ id: null, noiDung: '' });
   const [isEdit, setIsEdit] = useState(false);
+
+  // Lấy dữ liệu từ localStorage khi component được render
+  useEffect(() => {
+    const storedDanhGiaList = JSON.parse(localStorage.getItem('danhGiaList'));
+    if (storedDanhGiaList) {
+      setDanhGiaList(storedDanhGiaList);
+    }
+  }, []);
+
+  // Lưu dữ liệu vào localStorage mỗi khi danh sách danhGiaList thay đổi
+  useEffect(() => {
+    if (danhGiaList.length > 0) {
+      localStorage.setItem('danhGiaList', JSON.stringify(danhGiaList));
+    }
+  }, [danhGiaList]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,7 +44,12 @@ const NoiDungDanhGia = () => {
 
   const handleDelete = (id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa?')) {
-      setDanhGiaList(danhGiaList.filter((item) => item.id !== id));
+      const updatedDanhGiaList = danhGiaList.filter((item) => item.id !== id);
+      setDanhGiaList(updatedDanhGiaList);
+
+      // Cập nhật lại localStorage sau khi xóa
+      localStorage.setItem('danhGiaList', JSON.stringify(updatedDanhGiaList));
+
       setForm({ id: null, noiDung: '' });
       setIsEdit(false);
     }
