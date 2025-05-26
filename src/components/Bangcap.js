@@ -1,104 +1,190 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import {
+  Form,
+  Input,
+  Button,
+  Table,
+  Typography,
+  Row,
+  Col,
+  Space,
+  Modal,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 
-export default function Bangcap() {
-  // Khởi tạo dữ liệu từ localStorage nếu có
-  const [degrees, setDegrees] = useState(() => {
-    const savedDegrees = localStorage.getItem('degrees');
-    return savedDegrees ? JSON.parse(savedDegrees) : [
-      { id: 1, code: 'BC01', name: 'Cử nhân', shortName: 'CN' },
-      { id: 2, code: 'BC02', name: 'Thạc sĩ', shortName: 'ThS' }
-    ];
-  });
+const { Title } = Typography;
 
-  const [form, setForm] = useState({ id: null, code: '', name: '', shortName: '' });
+const API_URL = "http://localhost:8000/degree";
+
+const Bangcap = () => {
+  const [form] = Form.useForm();
+  const [degrees, setDegrees] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
-  // Lưu dữ liệu vào localStorage mỗi khi degrees thay đổi
   useEffect(() => {
-    localStorage.setItem('degrees', JSON.stringify(degrees));
-  }, [degrees]);
+    fetchDegrees();
+  }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const fetchDegrees = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      const data = response.data.bangcap || [];
 
-    if (!form.code.trim() || !form.name.trim() || !form.shortName.trim()) {
-      alert('Vui lòng nhập đầy đủ thông tin!');
-      return;
+      const mapped = data.map((item) => ({
+        id: item.ma_bang_cap,
+        name: item.ten_bang_cap,
+        shortName: item.ten_viet_tat,
+      }));
+
+      setDegrees(mapped);
+    } catch (error) {
+      console.error("Lỗi khi lấy danh sách bằng cấp:", error);
     }
-
-    if (isEdit) {
-      setDegrees(degrees.map(d => (d.id === form.id ? form : d)));
-      setIsEdit(false);
-    } else {
-      setDegrees([...degrees, { ...form, id: Date.now() }]);
-    }
-
-    setForm({ id: null, code: '', name: '', shortName: '' });
   };
 
-  const handleEdit = (degree) => {
-    setForm(degree);
+  const handleSubmit = async (values) => {
+    try {
+      if (isEdit) {
+        await axios.put(`${API_URL}/${editingId}`, {
+          ten_bang_cap: values.name,
+          ten_viet_tat: values.shortName,
+        });
+      } else {
+        await axios.post(API_URL, {
+          ma_bang_cap: values.id,
+          ten_bang_cap: values.name,
+          ten_viet_tat: values.shortName,
+        });
+      }
+
+      form.resetFields();
+      setIsEdit(false);
+      setEditingId(null);
+      fetchDegrees();
+    } catch (error) {
+      console.error("Lỗi khi gửi dữ liệu bằng cấp:", error);
+    }
+  };
+
+  const handleEdit = (record) => {
+    form.setFieldsValue({
+      id: record.id,
+      name: record.name,
+      shortName: record.shortName,
+    });
+    setEditingId(record.id);
     setIsEdit(true);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa?')) {
-      setDegrees(degrees.filter(d => d.id !== id));
-    }
+  const handleDelete = async (id) => {
+    Modal.confirm({
+      title: "Bạn có chắc muốn xóa?",
+      onOk: async () => {
+        try {
+          await axios.delete(`${API_URL}/${id}`);
+          fetchDegrees();
+        } catch (error) {
+          console.error("Lỗi khi xóa bằng cấp:", error);
+        }
+      },
+    });
   };
 
+  const columns = [
+    {
+      title: "Mã bằng",
+      dataIndex: "id",
+    },
+    {
+      title: "Tên bằng cấp",
+      dataIndex: "name",
+    },
+    {
+      title: "Tên viết tắt",
+      dataIndex: "shortName",
+    },
+    {
+      title: "Hành động",
+      render: (_, record) => (
+        <Space>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record)} />
+          <Button
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record.id)}
+          />
+        </Space>
+      ),
+    },
+  ];
+
   return (
-    <div className="content">
-      <h2>Quản lý bằng cấp</h2>
+    <div style={{ padding: 24 }}>
+      <Title level={3}>Quản lý bằng cấp</Title>
 
-      <form onSubmit={handleSubmit} className="form">
-        <input
-          type="text"
-          placeholder="Mã bằng cấp (VD: BC01)"
-          value={form.code}
-          onChange={(e) => setForm({ ...form, code: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Tên bằng cấp (VD: Cử nhân)"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Tên viết tắt (VD: CN)"
-          value={form.shortName}
-          onChange={(e) => setForm({ ...form, shortName: e.target.value })}
-          required
-        />
-        <button type="submit">{isEdit ? 'Cập nhật' : 'Thêm mới'}</button>
-      </form>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        initialValues={{ id: "", name: "", shortName: "" }}
+      >
+        <Row gutter={16}>
+          <Col span={6}>
+            <Form.Item
+              label="Mã bằng"
+              name="id"
+              rules={[{ required: true, message: "Nhập mã bằng" }]}
+            >
+              <Input placeholder="VD: BC01" disabled={isEdit} />
+            </Form.Item>
+          </Col>
+          <Col span={9}>
+            <Form.Item
+              label="Tên bằng cấp"
+              name="name"
+              rules={[{ required: true, message: "Nhập tên bằng cấp" }]}
+            >
+              <Input placeholder="VD: Cử nhân" />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item
+              label="Tên viết tắt"
+              name="shortName"
+              rules={[{ required: true, message: "Nhập tên viết tắt" }]}
+            >
+              <Input placeholder="VD: CN" />
+            </Form.Item>
+          </Col>
+          <Col span={3} style={{ display: "flex", alignItems: "end" }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              icon={<PlusOutlined />}
+              block
+            >
+              {isEdit ? "Cập nhật" : "Thêm"}
+            </Button>
+          </Col>
+        </Row>
+      </Form>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Mã</th>
-            <th>Tên bằng cấp</th>
-            <th>Viết tắt</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {degrees.map(d => (
-            <tr key={d.id}>
-              <td>{d.code}</td>
-              <td>{d.name}</td>
-              <td>{d.shortName}</td>
-              <td>
-                <button onClick={() => handleEdit(d)}>Sửa</button>
-                <button onClick={() => handleDelete(d.id)}>Xóa</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Table
+        columns={columns}
+        dataSource={degrees}
+        rowKey="id"
+        pagination={false}
+        bordered
+        style={{ marginTop: 24 }}
+      />
     </div>
   );
-}
+};
+
+export default Bangcap;

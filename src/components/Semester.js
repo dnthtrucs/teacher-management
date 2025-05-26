@@ -1,90 +1,179 @@
 import React, { useState, useEffect } from 'react';
+import {
+  Form,
+  Input,
+  DatePicker,
+  Button,
+  Table,
+  Typography,
+  Row,
+  Col,
+  Space,
+  message
+} from 'antd';
+import dayjs from 'dayjs';
 
-export default function Semester() {
-  // Khởi tạo dữ liệu từ localStorage nếu có
+const { Title } = Typography;
+
+export default function SemesterManagement() {
   const [semesters, setSemesters] = useState(() => {
-    const savedSemesters = localStorage.getItem('semesters');
-    return savedSemesters ? JSON.parse(savedSemesters) : [
-      { id: 1, name: 'HK1', year: '2024-2025' },
-      { id: 2, name: 'HK2', year: '2024-2025' }
-    ];
+    const saved = localStorage.getItem('semesters');
+    return saved ? JSON.parse(saved) : [];
   });
 
-  const [form, setForm] = useState({ id: null, name: '', year: '' });
-  const [isEdit, setIsEdit] = useState(false);
+  const [form] = Form.useForm();
+  const [editingId, setEditingId] = useState(null);
 
-  // Lưu dữ liệu semesters vào localStorage khi có thay đổi
   useEffect(() => {
     localStorage.setItem('semesters', JSON.stringify(semesters));
   }, [semesters]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (isEdit) {
-      setSemesters(semesters.map(s => s.id === form.id ? form : s));
-      setIsEdit(false);
+  const handleSubmit = (values) => {
+    const formatted = {
+      ...values,
+      startDate: values.startDate.format('YYYY-MM-DD'),
+      endDate: values.endDate.format('YYYY-MM-DD'),
+    };
+
+    if (editingId) {
+      setSemesters(
+        semesters.map((s) => (s.id === editingId ? { ...formatted, id: editingId } : s))
+      );
+      message.success('Cập nhật kỳ học thành công!');
     } else {
-      setSemesters([...semesters, { ...form, id: Date.now() }]);
+      setSemesters([...semesters, { ...formatted, id: Date.now() }]);
+      message.success('Thêm kỳ học mới thành công!');
     }
-    setForm({ id: null, name: '', year: '' });
+
+    form.resetFields();
+    setEditingId(null);
   };
 
-  const handleEdit = (s) => {
-    setForm(s);
-    setIsEdit(true);
+  const handleEdit = (record) => {
+    form.setFieldsValue({
+      ...record,
+      startDate: dayjs(record.startDate),
+      endDate: dayjs(record.endDate),
+    });
+    setEditingId(record.id);
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Bạn có chắc muốn xóa?')) {
-      setSemesters(semesters.filter(s => s.id !== id));
+    if (window.confirm('Xác nhận xóa?')) {
+      setSemesters(semesters.filter((s) => s.id !== id));
+      message.success('Đã xóa kỳ học.');
     }
   };
 
+  const columns = [
+    {
+      title: 'STT',
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: 'Tên kỳ',
+      dataIndex: 'name',
+    },
+    {
+      title: 'Năm học',
+      dataIndex: 'year',
+    },
+    {
+      title: 'Ngày bắt đầu',
+      dataIndex: 'startDate',
+    },
+    {
+      title: 'Ngày kết thúc',
+      dataIndex: 'endDate',
+    },
+    {
+      title: 'Hành động',
+      render: (_, record) => (
+        <Space>
+          <Button type="link" onClick={() => handleEdit(record)}>
+            Sửa
+          </Button>
+          <Button danger type="link" onClick={() => handleDelete(record.id)}>
+            Xóa
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
   return (
-    <div className="content">
-      <h2>Quản lý học kỳ - niên khóa</h2>
+    <div style={{ padding: 24 }}>
+      <Title level={3}>Quản lý kỳ học</Title>
 
-      <form onSubmit={handleSubmit} className="form">
-        <input
-          type="text"
-          placeholder="Học kỳ (VD: HK1)"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Niên khóa (VD: 2024-2025)"
-          value={form.year}
-          onChange={(e) => setForm({ ...form, year: e.target.value })}
-          required
-        />
-        <button type="submit">{isEdit ? 'Cập nhật' : 'Thêm mới'}</button>
-      </form>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        style={{ marginBottom: 32 }}
+      >
+        <Row gutter={16}>
+          <Col span={5}>
+            <Form.Item
+              name="name"
+              label="Tên kỳ"
+              rules={[{ required: true, message: 'Vui lòng nhập tên kỳ học' }]}
+            >
+              <Input placeholder="VD: HK1" />
+            </Form.Item>
+          </Col>
+          <Col span={5}>
+            <Form.Item
+              name="year"
+              label="Năm học"
+              rules={[{ required: true, message: 'Vui lòng nhập năm học' }]}
+            >
+              <Input placeholder="VD: 2024-2025" />
+            </Form.Item>
+          </Col>
+          <Col span={5}>
+            <Form.Item
+              name="startDate"
+              label="Ngày bắt đầu"
+              rules={[{ required: true, message: 'Vui lòng chọn ngày bắt đầu' }]}
+            >
+              <DatePicker style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={5}>
+            <Form.Item
+              name="endDate"
+              label="Ngày kết thúc"
+              rules={[{ required: true, message: 'Vui lòng chọn ngày kết thúc' }]}
+            >
+              <DatePicker style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={4} style={{ display: 'flex', alignItems: 'end' }}>
+            <Form.Item>
+              <Space>
+                <Button type="primary" htmlType="submit">
+                  {editingId ? 'Cập nhật' : 'Thêm mới'}
+                </Button>
+                {editingId && (
+                  <Button onClick={() => {
+                    form.resetFields();
+                    setEditingId(null);
+                  }}>
+                    Hủy
+                  </Button>
+                )}
+              </Space>
+            </Form.Item>
+          </Col>
+        </Row>
+      </Form>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Học kỳ</th>
-            <th>Niên khóa</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {semesters.map((s, index) => (
-            <tr key={s.id}>
-              <td>{index + 1}</td> {/* Số thứ tự tự động */}
-              <td>{s.name}</td>
-              <td>{s.year}</td>
-              <td>
-                <button onClick={() => handleEdit(s)}>Sửa</button>
-                <button onClick={() => handleDelete(s.id)}>Xóa</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Table
+        dataSource={semesters}
+        columns={columns}
+        rowKey="id"
+        pagination={{ pageSize: 5 }}
+      />
     </div>
   );
 }
