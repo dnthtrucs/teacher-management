@@ -8,6 +8,10 @@ import Course from './Course';
 import Quanlykhoa from './Quanlykhoa';
 import Bangcap from './Bangcap';
 import Evaluation from './Evaluation';
+import TienTheoTiet from './tientheotiet';
+import Hesogiaovien from './hesogiaovien';
+import Hesolop from './hesolop';
+import Tinhtienday from './tinhtienday';
 import ThongTinNguoiDung from './ThongTinNguoiDung';
 import NgachGiangVien from './NgachGiangVien';
 import BacGiangVien from './BacGiangVien';
@@ -33,6 +37,10 @@ export default function Dashboard() {
         {page === 'quanlykhoa' && <Quanlykhoa />}
         {page === 'bangcap' && <Bangcap />}
         {page === 'evaluation' && <Evaluation />}
+        {page === 'tientheotiet' && <TienTheoTiet />}
+        {page === 'hesogiaovien' && <Hesogiaovien />}
+        {page === 'hesolop' && <Hesolop />}
+        {page === 'tinhtienday' && <Tinhtienday />}
         {page === 'thongtinnguoidung' && <ThongTinNguoiDung />}
         {page === 'ngach' && <NgachGiangVien />}
         {page === 'bac' && <BacGiangVien />}

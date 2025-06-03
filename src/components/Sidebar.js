@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 export default function Sidebar({ onNavigate }) {
   const [showTeacherSubmenu, setShowTeacherSubmenu] = useState(false);
   const [showClassSubmenu, setShowClassSubmenu] = useState(false);
+  const [showMoneySubmenu, setShowMoneySubmenu] = useState(false);
 
   return (
     <div className="sidebar">
@@ -35,6 +36,22 @@ export default function Sidebar({ onNavigate }) {
             <li onClick={() => onNavigate('course')}>Quản lý học phần</li>
             <li onClick={() => onNavigate('semester')}>Quản lý kì học</li>
             <li onClick={() => onNavigate('class')}>Lớp học phần</li>
+          </ul>
+        )}
+
+        {/* Tính tiền dạy + submenu */}
+        <li
+          onClick={() => setShowMoneySubmenu(!showMoneySubmenu)}
+          style={{ cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          Tính Tiền Dạy {showMoneySubmenu ? '▾' : '▸'}
+        </li>
+        {showMoneySubmenu && (
+          <ul style={{ paddingLeft: '15px' }}>
+            <li onClick={() => onNavigate('tientheotiet')}>Tiền theo tiết</li>
+            <li onClick={() => onNavigate('hesogiaovien')}>Hệ số giáo viên</li>
+            <li onClick={() => onNavigate('hesolop')}>Hệ số lớp</li>
+            <li onClick={() => onNavigate('tinhtienday')}>Tính tiền dạy</li>
           </ul>
         )}
       </ul>
