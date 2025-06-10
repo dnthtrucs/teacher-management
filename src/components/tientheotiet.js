@@ -7,7 +7,7 @@ export default function DinhMuc() {
   const [dinhMuc, setDinhMuc] = useState(50000);
 
   return (
-    <Card title="Thiết lập định mức tiền/tiết" style={{ maxWidth: 600, margin: 'auto' }}>
+    <Card title="Thiết lập định mức tiền/tiết" style={{ margin: 'auto' }}>
       <div className="space-y-4">
         <div>
           <Text strong>Nhập định mức:</Text>

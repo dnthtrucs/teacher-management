@@ -35,7 +35,7 @@ const TinhTienDay = () => {
   };
 
   return (
-    <Card title="Tính tiền dạy" style={{ maxWidth: 800, margin: "auto" }}>
+    <Card title="Tính tiền dạy" style={{margin: "auto" }}>
       <Form
         layout="vertical"
         initialValues={formValues}
