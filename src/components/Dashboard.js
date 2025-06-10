@@ -11,6 +11,7 @@ import TienTheoTiet from './Tientheotiet';
 import Hesogiaovien from './Hesogiaovien';
 import Hesolop from './Hesolop';
 import Tinhtienday from './Tinhtienday';
+import Baocao from './baocao';
 export default function Dashboard() {
   const [page, setPage] = useState('teacher');
 
@@ -31,6 +32,7 @@ export default function Dashboard() {
         {page === 'hesogiaovien' && <Hesogiaovien />}
         {page === 'hesolop' && <Hesolop />}
         {page === 'tinhtienday' && <Tinhtienday />}
+        {page === 'baocao' && <Baocao />}
       </div>
     </div>
   );

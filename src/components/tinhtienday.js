@@ -53,7 +53,7 @@ const TinhTienDay = () => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Sĩ số lớp" name="siSo">
+            <Form.Item label="Hệ số lớp" name="heSoLop">
               <InputNumber min={0} className="w-full" />
             </Form.Item>
           </Col>

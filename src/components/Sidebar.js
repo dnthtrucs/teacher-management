@@ -4,6 +4,7 @@ export default function Sidebar({ onNavigate }) {
   const [showTeacherSubmenu, setShowTeacherSubmenu] = useState(false);
   const [showClassSubmenu, setShowClassSubmenu] = useState(false);
   const [showMoneySubmenu, setShowMoneySubmenu] = useState(false);
+  const [showReportSubmenu, setShowReportSubmenu] = useState(false);
 
   return (
     <div className="sidebar">
@@ -53,6 +54,18 @@ export default function Sidebar({ onNavigate }) {
             <li onClick={() => onNavigate('hesogiaovien')}>Hệ số giáo viên</li>
             <li onClick={() => onNavigate('hesolop')}>Hệ số lớp</li>
             <li onClick={() => onNavigate('tinhtienday')}>Tính tiền dạy</li>
+          </ul>
+        )}
+        {/* Báo Cáo + submenu */}
+        <li
+          onClick={() => setShowReportSubmenu(!showReportSubmenu)}
+          style={{ cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          Báo Cáo {showReportSubmenu ? '▾' : '▸'}
+        </li>
+        {showReportSubmenu && (
+          <ul style={{ paddingLeft: '15px' }}>
+            <li onClick={() => onNavigate('baocao')}>Báo cáo tiền dạy</li>
           </ul>
         )}
       </ul>
